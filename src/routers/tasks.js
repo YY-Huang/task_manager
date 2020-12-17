@@ -22,27 +22,22 @@ router.post('/tasks', authMiddleware, async (req, res) => {
 });
 
 router.get('/tasks', authMiddleware, async (req, res) => {
-  const userID = req.user._id;
-  try {
-    /* const tasks = await Task.find({ owner: req.user._id })
+  const match = {}
 
-		if (!tasks) {
-			res.status(400).send();
-		}
-		res.send(tasks)
-    */
+  if (req.query.completed) {
+    match.completed = req.query.completed === 'true'
+  }
+  try {
     await req.user.populate({
       path: 'tasks',
-      match: {
-        completed: true,
-      },
+      match
     }).execPopulate();
-    // await req.user.populate('tasks').execPopulate();
     res.send(req.user.tasks);
   } catch (e) {
     res.status(500).send();
   }
 });
+
 
 router.get('/tasks/:id', authMiddleware, async (req, res) => {
   const _id = req.params.id;
