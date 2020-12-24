@@ -14,7 +14,21 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const upload = multer({
-	dest: "images"
+	dest: "images",
+	limits: {
+		fileSize: 1000000 // 1MB
+	},
+	fileFilter(req, file,  cb) {
+		if (!file.originalname.match(/\.(doc|docx)$/gm)) {
+			return cb(new Error("Please upload a PDF"));
+		}
+
+		cb(undefined, true);
+		/* 
+			silently reject a file
+			cb(undefined,  false)
+		*/
+	}
 });
 
 app.post("/upload", upload.single("upload"), (req, res) => {
